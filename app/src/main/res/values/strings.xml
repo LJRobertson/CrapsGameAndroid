@@ -1,0 +1,14 @@
+<resources>
+    <string name="app_name">CrapsGame</string>
+    <string name="bankroll">Bankroll</string>
+    <string name="roll">Roll</string>
+    <string name="point_set">The Point Is Set To: %d</string>
+    <string name="place_bet">Place Bet</string>
+    <string name="roll_again">Roll Again</string>
+    <string name="quit">Quit</string>
+    <string name="amount_bet">Bet $%d</string>
+    <string name="you_lose">You Lose</string>
+    <string name="you_win">You Win!</string>
+    <string name="amount_won">Amount Won: %d</string>
+    <string name="roll_total">Roll of %d</string>
+</resources>
