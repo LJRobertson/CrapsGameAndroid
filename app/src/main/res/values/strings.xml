@@ -1,8 +1,8 @@
 <resources>
-    <string name="app_name">CrapsGame</string>
-    <string name="bankroll">Bankroll</string>
+    <string name="app_name">Craps Game</string>
+    <string name="bankroll">Bankroll: </string>
     <string name="roll">Roll</string>
-    <string name="point_set">The Point Is Set To: %d</string>
+    <string name="point_set">The Point Is Set To: </string>
     <string name="place_bet">Place Bet</string>
     <string name="roll_again">Roll Again</string>
     <string name="quit">Quit</string>
