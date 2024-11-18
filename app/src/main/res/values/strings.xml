@@ -9,6 +9,6 @@
     <string name="amount_bet">Bet $%d</string>
     <string name="you_lose">You Lose</string>
     <string name="you_win">You Win!</string>
-    <string name="amount_won">Amount Won: %d</string>
-    <string name="roll_total">Roll of %d</string>
+    <string name="amount_won">Amount Won: </string>
+    <string name="roll_total">Roll of: </string>
 </resources>

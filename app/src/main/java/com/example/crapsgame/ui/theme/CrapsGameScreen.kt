@@ -14,6 +14,8 @@ import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.width
+import androidx.compose.foundation.rememberScrollState
+import androidx.compose.foundation.verticalScroll
 import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.material3.Button
@@ -21,12 +23,18 @@ import androidx.compose.material3.CenterAlignedTopAppBar
 import androidx.compose.material3.Scaffold
 import androidx.compose.ui.res.stringResource
 import androidx.compose.material3.Text
+import androidx.compose.material3.rememberBottomAppBarState
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.ui.res.painterResource
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableDoubleStateOf
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
+import java.security.KeyStore.TrustedCertificateEntry
+import androidx.compose.runtime.remember
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.setValue
 
 
 @OptIn(ExperimentalMaterial3Api::class)
@@ -72,45 +80,47 @@ fun CrapsGameApp(
         5 -> R.drawable.five_black_310334_1280
         else -> R.drawable.six_black_310333_1280
     }
-    var bankrollBalance by remember {mutableStateOf(100.00)}
-    var isPointSet: Boolean = true
-    var point: Int = 3
-    var totalRoll = resultDie1 + resultDie2
-    var isFirstRoll: Boolean = false
+    var bankrollBalance by remember { mutableDoubleStateOf(100.00) }
+    var isPointSet by remember { mutableStateOf(false) }
+    var point by remember { mutableStateOf<Int?>(null)}
 
-    //TODO: AppBar pass in
+    var totalRoll: Int
+    var isFirstRoll by remember { mutableStateOf(true) }
+    var placedBet by remember { mutableDoubleStateOf(5.00) }
+    var amountWon by remember { mutableDoubleStateOf(0.00)}
     Scaffold(
         topBar = { CrapsGameTopAppBar() },
-    ) { it ->
+    ) {it ->
         Column(
             modifier = modifier
                 .fillMaxSize()
-                .padding(it),
-            verticalArrangement = Arrangement.Center,
+                .padding(it)
+                .verticalScroll(rememberScrollState()),
+            //verticalArrangement = Arrangement.Top,
             horizontalAlignment = Alignment.CenterHorizontally,
-
             ) {
             //Add space after top bar
             //Spacer(modifier = Modifier.weight(0.5f))
             //point row
             Row(
                 modifier = modifier
-            ){
-                if (isPointSet == true){
+                    .padding(0.dp)
+            ) {
+                if (isPointSet == true) {
                     Text(
-                        text = stringResource(R.string.point_set) +" $point"
+                        text = stringResource(R.string.point_set) + " $point"
                     )
                 }
             }
-            Spacer(modifier = Modifier.height(30.dp))
+            //Spacer(modifier = Modifier.height(20.dp))
             //Row to hold the dice
             Row(
-
                 modifier = modifier
+                    .padding(0.dp)
                     .fillMaxWidth(),
                 //.fillMaxWidth(),
                 horizontalArrangement = Arrangement.Center,
-                verticalAlignment = Alignment.CenterVertically,
+                //verticalAlignment = Alignment.CenterVertically,
             ) {
                 Image(
                     painter = painterResource(imageResourceDie1),
@@ -127,30 +137,60 @@ fun CrapsGameApp(
                         .height(100.dp)
                 )
             }
-            Spacer(modifier = Modifier.height(40.dp))
+            //Spacer(modifier = Modifier.height(10.dp))
             //row to hold the button
             Row(
-
-                modifier = modifier,
-                    //.weight(1f),
-                horizontalArrangement = Arrangement.spacedBy(20.dp)
+                modifier = modifier
+                    .padding(0.dp)
+                    .fillMaxWidth(),
+                horizontalArrangement = Arrangement.Center,
+                //verticalAlignment = Alignment.CenterVertically
+                //.weight(1f),
+                //horizontalArrangement = Arrangement.spacedBy(20.dp)
                 //.fillMaxWidth()
                 //.padding(innerPadding),
             ) {
 
                 Button(
                     onClick = {
+                        //roll the dice
                         resultDie1 = (1..6).random()
                         resultDie2 = (1..6).random()
+
+                        totalRoll = resultDie1 + resultDie2
+
+                        //check for point
+                        if (isPointSet == false) {
+                            point = (DeterminePointSet(totalRoll))
+                            if (point != null){
+                                isPointSet = true
+                            }
+                        }
+
+                        //run the game
+                        amountWon = RunCrapsGame(totalRoll, isFirstRoll, placedBet, point)
+                        //update bankroll
+                        bankrollBalance = bankrollBalance + amountWon
+
+                        //if game is won rest the roll
+                        if ( isPointSet == true && totalRoll == point ){
+                            isFirstRoll = true
+                            isPointSet = false
+                        }
                     },
                 ) {
                     Text(text = stringResource(R.string.roll))
                 }
             }
-            //Spacer(modifier = Modifier.height(15.dp))
+            //Spacer(modifier = Modifier.height(10.dp))
             //row to hold the button
             Row(
                 modifier = modifier
+                    .padding(0.dp)
+                    .fillMaxWidth(),
+                horizontalArrangement = Arrangement.Center,
+                //verticalAlignment = Alignment.CenterVertically
+
                 //.weight(1f),
             ) {
                 Text(
@@ -160,14 +200,95 @@ fun CrapsGameApp(
                     text = bankrollBalance.toString()
                 )
             }
+            Row(
+                modifier = modifier
+                    .padding(0.dp)
+                    .fillMaxWidth(),
+                horizontalArrangement = Arrangement.Center,
+                //verticalAlignment = Alignment.CenterVertically
+            ) {
+                Text(
+                    text = stringResource(R.string.amount_won) + "$amountWon"
+                )
+            }
         }
     }
 }
 
+fun RunCrapsGame(diceTotal: Int, isFirstRole: Boolean, currentBet: Double, gamePoint: Int?): Double{
+    var pointSet: Int?
+    var amountWon: Double = 0.00
 
-fun FirstRoundPayout(totalRoll: Int){
+    if (isFirstRole == true) {
+        amountWon = FirstRoundPayout(diceTotal, currentBet)
+        DeterminePointSet(diceTotal)
 
+    }
+    if (gamePoint != null){
+        pointSet = gamePoint
+        amountWon = SubsequentRoundPayout(diceTotal, currentBet, pointSet)
+    }
+    return amountWon
+}
 
+fun DeterminePointSet(totalRoll: Int): Int? {
+    val nonPointNumbers = setOf(2, 3, 7, 11, 12)
+    var pointNumber: Int
+
+    if (totalRoll in nonPointNumbers) {
+        return null
+    } else {
+        pointNumber = totalRoll
+        return pointNumber
+    }
+}
+
+fun FirstRoundPayout(totalRoll: Int, currentBet: Double): Double {
+    val winningNumbers = setOf(7, 11)
+    val losingNumbers = setOf(2, 3, 12)
+    var payout: Double
+
+    if (totalRoll in losingNumbers) {
+        payout = 0.00 - currentBet //loses bet
+        return payout
+    } else if (totalRoll in winningNumbers) {
+        payout = currentBet * 2 // pays double
+        return payout
+    } else {
+        payout = 0.00
+        return payout
+    }
+}
+
+fun SubsequentRoundPayout(totalRoll: Int, currentBet: Double, gamePoint: Int): Double {
+    var payout: Double = 0.00
+    var units: Double
+
+    if (totalRoll == 7) {
+        payout = 0 - currentBet // loses bet
+    }
+    else if (totalRoll == gamePoint) {
+        if (gamePoint == 4 || gamePoint == 10) {
+            //payout is 9:5
+            units = currentBet // 5
+            payout = units * 9
+            return payout
+        } else if (gamePoint == 5 || gamePoint == 9) {
+            //payout is 7:5
+            units = currentBet // 5
+            payout = units * 7
+            return payout
+        } else if (gamePoint == 6 || gamePoint == 8) {
+            //payout is 6:7
+            units = currentBet // 6
+            payout = units * 7
+            return payout
+        }
+    } else {
+        //nothing won or lost
+        payout = 0.00
+    }
+    return payout
 }
 
 @Preview
