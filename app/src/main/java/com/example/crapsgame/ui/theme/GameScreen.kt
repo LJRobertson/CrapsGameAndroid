@@ -50,6 +50,9 @@ import androidx.navigation.compose.NavHost
 import com.example.crapsgame.ui.theme.PlaceBetScreen
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.ui.res.dimensionResource
+import androidx.lifecycle.ViewModel
+import androidx.lifecycle.viewmodel.compose.viewModel
+import com.example.crapsgame.model.DiceItem
 import com.example.crapsgame.ui.theme.HelpScreen
 import com.example.crapsgame.ui.theme.PreferencesScreen
 
@@ -61,34 +64,23 @@ fun GameScreen(
     onHelpButtonClicked: () -> Unit,
     onPreferencesButtonClicked: () -> Unit,
     modifier: Modifier = Modifier
-) {
-    //dice always show 1 and 6
+    ) {
+    //dice always show 1 and 6 to start
+    var imageDie1 by remember { mutableStateOf(R.drawable.one_black_310338_1280) }
+    var imageDie2 by remember { mutableStateOf(R.drawable.six_black_310333_1280) }
     var resultDie1 by remember { mutableStateOf(1) }
     var resultDie2 by remember { mutableStateOf(6) }
     //imageResource of each die
-    val imageResourceDie1 = when (resultDie1) {
-        1 -> R.drawable.one_black_310338_1280
-        2 -> R.drawable.two_black_310337_1280
-        3 -> R.drawable.three_black_310336_1280
-        4 -> R.drawable.four_black_310335_1280
-        5 -> R.drawable.five_black_310334_1280
-        else -> R.drawable.six_black_310333_1280
-    }
-    val imageResourceDie2 = when (resultDie2) {
-        1 -> R.drawable.one_black_310338_1280
-        2 -> R.drawable.two_black_310337_1280
-        3 -> R.drawable.three_black_310336_1280
-        4 -> R.drawable.four_black_310335_1280
-        5 -> R.drawable.five_black_310334_1280
-        else -> R.drawable.six_black_310333_1280
-    }
+        //Moved to DiceItem
+
     var bankrollBalance by remember { mutableDoubleStateOf(100.00) }
     var isPointSet by remember { mutableStateOf(false) }
     var point by remember { mutableStateOf<Int?>(null) }
+    var isBlack by remember {mutableStateOf(true)}
 
     var totalRoll: Int
     var isFirstRoll by remember { mutableStateOf(true) }
-    var placedBet by remember { mutableDoubleStateOf(5.00) }
+    var currentBet by remember { mutableDoubleStateOf(5.00) }
     var amountWon by remember { mutableDoubleStateOf(0.00) }
     Scaffold(
         //topBar = { CrapsGameTopAppBar() },
@@ -96,7 +88,7 @@ fun GameScreen(
     ) { it ->
         //val uiState by viewModel.uiState.collectAsState()
         //add NavHost
-                Column(
+        Column(
             modifier = modifier
                 .fillMaxSize()
                 .padding(it)
@@ -129,21 +121,21 @@ fun GameScreen(
                 //verticalAlignment = Alignment.CenterVertically,
             ) {
                 Image(
-                    painter = painterResource(imageResourceDie1),
-                    contentDescription = resultDie1.toString(),
-                    modifier = Modifier
-                        .height(100.dp)
-                )
+                  painter = painterResource(imageDie1),
+                  contentDescription = imageDie1.toString(),
+                  modifier = Modifier
+                      .height(100.dp)
+                  )
                 //add some space between the dice
                 Spacer(modifier = Modifier.width(30.dp))
                 Image(
-                    painter = painterResource(imageResourceDie2),
-                    contentDescription = resultDie2.toString(),
+                    painter = painterResource(imageDie2),
+                    contentDescription = imageDie2.toString(),
                     modifier = Modifier
                         .height(100.dp)
                 )
             }
-            //Spacer(modifier = Modifier.height(10.dp))
+
             //row to hold the button
             Row(
                 modifier = modifier
@@ -151,20 +143,21 @@ fun GameScreen(
                     .padding(bottom = 30.dp)
                     .fillMaxWidth(),
                 horizontalArrangement = Arrangement.Center,
-                //verticalAlignment = Alignment.CenterVertically
-                //.weight(1f),
-                //horizontalArrangement = Arrangement.spacedBy(20.dp)
-                //.fillMaxWidth()
-                //.padding(innerPadding),
             ) {
 
                 Button(
                     onClick = {
                         //roll the dice
-                        resultDie1 = (1..6).random()
-                        resultDie2 = (1..6).random()
+                        var (totalRoll, diceItem) = RollDice(isBlack)
 
-                        totalRoll = resultDie1 + resultDie2
+                        //get the total and new images back
+                        val (newImageDie1, newImageDie2) = diceItem.getImageResources()
+                        //store the new images over the old
+                        imageDie1 = newImageDie1
+                        imageDie2 = newImageDie2
+
+                        //run a round of the game
+                        RunCrapsGame(totalRoll, isFirstRoll, currentBet, point)
 
                         //check for point
                         if (isPointSet == false) {
@@ -175,7 +168,7 @@ fun GameScreen(
                         }
 
                         //run the game
-                        amountWon = RunCrapsGame(totalRoll, isFirstRoll, placedBet, point)
+                        amountWon = RunCrapsGame(totalRoll, isFirstRoll, currentBet, point)
                         //update bankroll
                         bankrollBalance = bankrollBalance + amountWon
 
@@ -228,7 +221,6 @@ fun GameScreen(
                 Button(
                     onClick = {
                         onPlaceBetButtonClicked()
-                        //navController.navigate(CrapsGameScreen.PlaceBet.name)
                     },
                 ) {
                     Text(text = stringResource(R.string.place_bet))
@@ -253,28 +245,39 @@ fun GameScreen(
                 Button(
                     onClick = { //navController.navigate((CrapsGameScreen.Help.name))
                         onHelpButtonClicked()
-                        },
+                    },
                     modifier = Modifier
                         .fillMaxWidth(0.50f)
-                ){
+                ) {
                     Text(text = stringResource(R.string.help_screen))
                 }
 
-                Spacer(modifier= Modifier.padding(start = 15.dp))
+                Spacer(modifier = Modifier.padding(start = 15.dp))
 
                 //Preferences Button
                 Button(
-                    onClick = { //navController.navigate(CrapsGameScreen.Preferences.name)
+                    onClick = {
                         onPreferencesButtonClicked()
-                              },
+                    },
                     modifier = Modifier
                         .fillMaxWidth()
-                ){
+                ) {
                     Text(text = stringResource(R.string.preferences))
                 }
             }
         }
     }
+}
+
+
+//Roll Dice -- happens when Roll is clicked
+fun RollDice(isBlack: Boolean): Pair<Int, DiceItem> {
+    var resultDie1 = (1..6).random()
+    var resultDie2 = (1..6).random()
+    val diceItem = DiceItem(resultDie1, resultDie2, isBlack)
+    //val diceImages = diceItem.getImageResources(resultDie1, resultDie2)
+    var totalRoll = resultDie1 + resultDie2
+    return Pair(totalRoll, diceItem)
 }
 
 fun RunCrapsGame(
