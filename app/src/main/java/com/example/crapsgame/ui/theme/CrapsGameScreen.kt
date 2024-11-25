@@ -1,5 +1,6 @@
 package com.example.crapsgame.ui.theme
 
+import androidx.annotation.StringRes
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.runtime.Composable
@@ -35,7 +36,30 @@ import java.security.KeyStore.TrustedCertificateEntry
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.setValue
+import androidx.navigation.compose.NavHost
+import androidx.compose.foundation.layout.padding
+import androidx.navigation.compose.composable
+import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.res.dimensionResource
+import androidx.compose.foundation.layout.fillMaxHeight
+import androidx.compose.material3.MaterialTheme
+import androidx.navigation.compose.rememberNavController
+import androidx.navigation.NavHostController
+import androidx.navigation.compose.NavHost
+import com.example.crapsgame.ui.theme.PlaceBetScreen
+import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.ui.res.dimensionResource
+import com.example.crapsgame.ui.theme.HelpScreen
+import com.example.crapsgame.ui.theme.PreferencesScreen
 
+
+enum class CrapsGameScreen(@StringRes val title: Int) {
+    Start(title = R.string.app_name),
+    PlaceBet(title = R.string.place_bet),
+    Help(title = R.string.help_screen),
+    Preferences(title = R.string.preferences)
+}
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
@@ -46,6 +70,7 @@ fun CrapsGameTopAppBar(modifier: Modifier = Modifier) {
                 verticalAlignment = Alignment.CenterVertically
             ) {
                 Text(
+                    style = MaterialTheme.typography.displayLarge,
                     text = stringResource(R.string.app_name)
                 )
             }
@@ -54,13 +79,16 @@ fun CrapsGameTopAppBar(modifier: Modifier = Modifier) {
     )
 }
 
-
 //layout the game screen
 @Composable
 fun CrapsGameApp(
+    navController: NavHostController = rememberNavController(),
+    //onPlaceBetButtonClicked: () -> Unit,
+    //onHelpButtonClicked: () -> Unit,
+    //onPreferencesButtonClicked: () -> Unit,
     modifier: Modifier = Modifier
 ) {
-    //dice always show 1
+    //dice always show 1 and 6
     var resultDie1 by remember { mutableStateOf(1) }
     var resultDie2 by remember { mutableStateOf(6) }
     //imageResource of each die
@@ -82,217 +110,62 @@ fun CrapsGameApp(
     }
     var bankrollBalance by remember { mutableDoubleStateOf(100.00) }
     var isPointSet by remember { mutableStateOf(false) }
-    var point by remember { mutableStateOf<Int?>(null)}
+    var point by remember { mutableStateOf<Int?>(null) }
 
     var totalRoll: Int
     var isFirstRoll by remember { mutableStateOf(true) }
     var placedBet by remember { mutableDoubleStateOf(5.00) }
-    var amountWon by remember { mutableDoubleStateOf(0.00)}
+    var amountWon by remember { mutableDoubleStateOf(0.00) }
     Scaffold(
         topBar = { CrapsGameTopAppBar() },
-    ) {it ->
-        Column(
-            modifier = modifier
-                .fillMaxSize()
-                .padding(it)
-                .verticalScroll(rememberScrollState()),
-            //verticalArrangement = Arrangement.Top,
-            horizontalAlignment = Alignment.CenterHorizontally,
-            ) {
-            //Add space after top bar
-            //Spacer(modifier = Modifier.weight(0.5f))
-            //point row
-            Row(
-                modifier = modifier
-                    .padding(0.dp)
-            ) {
-                if (isPointSet == true) {
-                    Text(
-                        text = stringResource(R.string.point_set) + " $point"
-                    )
-                }
-            }
-            //Spacer(modifier = Modifier.height(20.dp))
-            //Row to hold the dice
-            Row(
-                modifier = modifier
-                    .padding(0.dp)
-                    .fillMaxWidth(),
-                //.fillMaxWidth(),
-                horizontalArrangement = Arrangement.Center,
-                //verticalAlignment = Alignment.CenterVertically,
-            ) {
-                Image(
-                    painter = painterResource(imageResourceDie1),
-                    contentDescription = resultDie1.toString(),
-                    modifier = Modifier
-                        .height(100.dp)
+        modifier = Modifier
+    ) { it ->
+        //val uiState by viewModel.uiState.collectAsState()
+        //add NavHost
+        NavHost(
+            navController = navController,
+            startDestination = CrapsGameScreen.Start.name,
+            modifier = Modifier.padding(it)
+        ) {
+            composable(route = CrapsGameScreen.Start.name) {
+                GameScreen(
+                    onPlaceBetButtonClicked = {navController.navigate(CrapsGameScreen.PlaceBet.name)},
+                    onHelpButtonClicked = {navController.navigate(CrapsGameScreen.Help.name)},
+                    onPreferencesButtonClicked = {navController.navigate(CrapsGameScreen.Preferences.name)},
                 )
-                //add some space between the dice
-                Spacer(modifier = Modifier.width(30.dp))
-                Image(
-                    painter = painterResource(imageResourceDie2),
-                    contentDescription = resultDie2.toString(),
-                    modifier = Modifier
-                        .height(100.dp)
+                //modifier = Modifier
+                //.fillMaxSize()
+                //.padding()
+            }
+            composable(route = CrapsGameScreen.PlaceBet.name) {
+                //val context = LocalContext.current
+                //call PlaceBet Screen
+                PlaceBetScreen(
+                    //TODO: pass in and out bankroll
+                    //bankRoll = uiState.bankRoll,
                 )
             }
-            //Spacer(modifier = Modifier.height(10.dp))
-            //row to hold the button
-            Row(
-                modifier = modifier
-                    .padding(0.dp)
-                    .fillMaxWidth(),
-                horizontalArrangement = Arrangement.Center,
-                //verticalAlignment = Alignment.CenterVertically
-                //.weight(1f),
-                //horizontalArrangement = Arrangement.spacedBy(20.dp)
-                //.fillMaxWidth()
-                //.padding(innerPadding),
-            ) {
-
-                Button(
-                    onClick = {
-                        //roll the dice
-                        resultDie1 = (1..6).random()
-                        resultDie2 = (1..6).random()
-
-                        totalRoll = resultDie1 + resultDie2
-
-                        //check for point
-                        if (isPointSet == false) {
-                            point = (DeterminePointSet(totalRoll))
-                            if (point != null){
-                                isPointSet = true
-                            }
-                        }
-
-                        //run the game
-                        amountWon = RunCrapsGame(totalRoll, isFirstRoll, placedBet, point)
-                        //update bankroll
-                        bankrollBalance = bankrollBalance + amountWon
-
-                        //if game is won rest the roll
-                        if ( isPointSet == true && totalRoll == point ){
-                            isFirstRoll = true
-                            isPointSet = false
-                        }
-                    },
-                ) {
-                    Text(text = stringResource(R.string.roll))
-                }
+            composable(route = CrapsGameScreen.Help.name) {
+                HelpScreen()
+                //TODO:
             }
-            //Spacer(modifier = Modifier.height(10.dp))
-            //row to hold the button
-            Row(
-                modifier = modifier
-                    .padding(0.dp)
-                    .fillMaxWidth(),
-                horizontalArrangement = Arrangement.Center,
-                //verticalAlignment = Alignment.CenterVertically
-
-                //.weight(1f),
-            ) {
-                Text(
-                    text = stringResource(R.string.bankroll)
-                )
-                Text(
-                    text = bankrollBalance.toString()
-                )
-            }
-            Row(
-                modifier = modifier
-                    .padding(0.dp)
-                    .fillMaxWidth(),
-                horizontalArrangement = Arrangement.Center,
-                //verticalAlignment = Alignment.CenterVertically
-            ) {
-                Text(
-                    text = stringResource(R.string.amount_won) + "$amountWon"
-                )
+            composable(route = CrapsGameScreen.Preferences.name) {
+                PreferencesScreen()
+                //TODO:
             }
         }
     }
 }
 
-fun RunCrapsGame(diceTotal: Int, isFirstRole: Boolean, currentBet: Double, gamePoint: Int?): Double{
-    var pointSet: Int?
-    var amountWon: Double = 0.00
 
-    if (isFirstRole == true) {
-        amountWon = FirstRoundPayout(diceTotal, currentBet)
-        DeterminePointSet(diceTotal)
 
-    }
-    if (gamePoint != null){
-        pointSet = gamePoint
-        amountWon = SubsequentRoundPayout(diceTotal, currentBet, pointSet)
-    }
-    return amountWon
-}
-
-fun DeterminePointSet(totalRoll: Int): Int? {
-    val nonPointNumbers = setOf(2, 3, 7, 11, 12)
-    var pointNumber: Int
-
-    if (totalRoll in nonPointNumbers) {
-        return null
-    } else {
-        pointNumber = totalRoll
-        return pointNumber
-    }
-}
-
-fun FirstRoundPayout(totalRoll: Int, currentBet: Double): Double {
-    val winningNumbers = setOf(7, 11)
-    val losingNumbers = setOf(2, 3, 12)
-    var payout: Double
-
-    if (totalRoll in losingNumbers) {
-        payout = 0.00 - currentBet //loses bet
-        return payout
-    } else if (totalRoll in winningNumbers) {
-        payout = currentBet * 2 // pays double
-        return payout
-    } else {
-        payout = 0.00
-        return payout
-    }
-}
-
-fun SubsequentRoundPayout(totalRoll: Int, currentBet: Double, gamePoint: Int): Double {
-    var payout: Double = 0.00
-    var units: Double
-
-    if (totalRoll == 7) {
-        payout = 0 - currentBet // loses bet
-    }
-    else if (totalRoll == gamePoint) {
-        if (gamePoint == 4 || gamePoint == 10) {
-            //payout is 9:5
-            units = currentBet // 5
-            payout = units * 9
-            return payout
-        } else if (gamePoint == 5 || gamePoint == 9) {
-            //payout is 7:5
-            units = currentBet // 5
-            payout = units * 7
-            return payout
-        } else if (gamePoint == 6 || gamePoint == 8) {
-            //payout is 6:7
-            units = currentBet // 6
-            payout = units * 7
-            return payout
-        }
-    } else {
-        //nothing won or lost
-        payout = 0.00
-    }
-    return payout
-}
 
 @Preview
 @Composable
 fun CrapsGamePreview() {
-    CrapsGameApp()
+    CrapsGameApp(
+        //onPlaceBetButtonClicked = {},
+        //onHelpButtonClicked = {},
+        //onPreferencesButtonClicked = {}
+    )
 }

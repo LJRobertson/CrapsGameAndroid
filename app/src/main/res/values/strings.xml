@@ -11,4 +11,17 @@
     <string name="you_win">You Win!</string>
     <string name="amount_won">Amount Won: </string>
     <string name="roll_total">Roll of: </string>
+    <string name="five_dollars">$5.00</string>
+    <string name="ten_dollars">$10.00</string>
+    <string name="twenty_five_dollars">$25.00</string>
+    <string name="one_hundred_dollars">$100.00</string>
+    <string name="help_screen">Help</string>
+    <string name="preferences">Preferences</string>
+    <string name="dice_color">Dice Color Options</string>
+    <string name="red">Red</string>
+    <string name="black">Black</string>
+    <string name="save_preferences">Save Preferences</string>
+    <string name="how_to_play">How To Play</string>
+    <string name="odds">Odds</string>
+
 </resources>
