@@ -6,7 +6,7 @@
     <string name="place_bet">Place Bet</string>
     <string name="roll_again">Roll Again</string>
     <string name="quit">Quit</string>
-    <string name="amount_bet">Bet $%d</string>
+    <string name="amount_bet">Amount Bet: </string>
     <string name="you_lose">You Lose</string>
     <string name="you_win">You Win!</string>
     <string name="amount_won">Amount Won: </string>
@@ -23,5 +23,6 @@
     <string name="save_preferences">Save Preferences</string>
     <string name="how_to_play">How To Play</string>
     <string name="odds">Odds</string>
+    <string name="amount_lost">Amount Lost: </string>
 
 </resources>

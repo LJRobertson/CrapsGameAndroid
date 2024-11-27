@@ -49,7 +49,10 @@ import androidx.navigation.NavHostController
 import androidx.navigation.compose.NavHost
 import com.example.crapsgame.ui.theme.PlaceBetScreen
 import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.runtime.collectAsState
+import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.ui.res.dimensionResource
+import androidx.lifecycle.viewmodel.compose.viewModel
 import com.example.crapsgame.ui.theme.HelpScreen
 import com.example.crapsgame.ui.theme.PreferencesScreen
 
@@ -82,45 +85,18 @@ fun CrapsGameTopAppBar(modifier: Modifier = Modifier) {
 //layout the game screen
 @Composable
 fun CrapsGameApp(
+    crapsGameViewModel: CrapsGameViewModel = viewModel(),
     navController: NavHostController = rememberNavController(),
     //onPlaceBetButtonClicked: () -> Unit,
     //onHelpButtonClicked: () -> Unit,
     //onPreferencesButtonClicked: () -> Unit,
     modifier: Modifier = Modifier
 ) {
-    //dice always show 1 and 6
-    var resultDie1 by remember { mutableStateOf(1) }
-    var resultDie2 by remember { mutableStateOf(6) }
-    //imageResource of each die
-    val imageResourceDie1 = when (resultDie1) {
-        1 -> R.drawable.one_black_310338_1280
-        2 -> R.drawable.two_black_310337_1280
-        3 -> R.drawable.three_black_310336_1280
-        4 -> R.drawable.four_black_310335_1280
-        5 -> R.drawable.five_black_310334_1280
-        else -> R.drawable.six_black_310333_1280
-    }
-    val imageResourceDie2 = when (resultDie2) {
-        1 -> R.drawable.one_black_310338_1280
-        2 -> R.drawable.two_black_310337_1280
-        3 -> R.drawable.three_black_310336_1280
-        4 -> R.drawable.four_black_310335_1280
-        5 -> R.drawable.five_black_310334_1280
-        else -> R.drawable.six_black_310333_1280
-    }
-    var bankrollBalance by remember { mutableDoubleStateOf(100.00) }
-    var isPointSet by remember { mutableStateOf(false) }
-    var point by remember { mutableStateOf<Int?>(null) }
-
-    var totalRoll: Int
-    var isFirstRoll by remember { mutableStateOf(true) }
-    var placedBet by remember { mutableDoubleStateOf(5.00) }
-    var amountWon by remember { mutableDoubleStateOf(0.00) }
     Scaffold(
         topBar = { CrapsGameTopAppBar() },
         modifier = Modifier
     ) { it ->
-        //val uiState by viewModel.uiState.collectAsState()
+        val uiState by crapsGameViewModel.uiState.collectAsState()
         //add NavHost
         NavHost(
             navController = navController,
@@ -129,29 +105,27 @@ fun CrapsGameApp(
         ) {
             composable(route = CrapsGameScreen.Start.name) {
                 GameScreen(
+                    viewModel = crapsGameViewModel,
                     onPlaceBetButtonClicked = {navController.navigate(CrapsGameScreen.PlaceBet.name)},
                     onHelpButtonClicked = {navController.navigate(CrapsGameScreen.Help.name)},
                     onPreferencesButtonClicked = {navController.navigate(CrapsGameScreen.Preferences.name)},
                 )
-                //modifier = Modifier
-                //.fillMaxSize()
-                //.padding()
             }
             composable(route = CrapsGameScreen.PlaceBet.name) {
-                //val context = LocalContext.current
                 //call PlaceBet Screen
                 PlaceBetScreen(
-                    //TODO: pass in and out bankroll
-                    //bankRoll = uiState.bankRoll,
+                    viewModel = crapsGameViewModel,
+                    onPlaceBetButtonClicked = {navController.navigateUp()}
+
                 )
             }
             composable(route = CrapsGameScreen.Help.name) {
                 HelpScreen()
-                //TODO:
             }
             composable(route = CrapsGameScreen.Preferences.name) {
-                PreferencesScreen()
-                //TODO:
+                PreferencesScreen(
+                    viewModel = crapsGameViewModel,
+                    )
             }
         }
     }
