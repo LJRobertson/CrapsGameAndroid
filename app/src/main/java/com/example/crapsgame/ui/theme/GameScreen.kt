@@ -55,11 +55,11 @@ fun GameScreen(
     //imageResource of each die
     //Moved to DiceItem
 
-    var bankrollBalance by rememberSaveable() { mutableDoubleStateOf(100.00) }
+    val bankrollBalance by viewModel.bankroll.collectAsState()
     val isPointSet by viewModel.isPointSet.collectAsState()
     //val isBlack by rememberSaveable {mutableStateOf(true)}
     val isBlack by viewModel.isBlack.collectAsState()
-
+    var newBankroll: Double
     var totalRoll: Int
     val isFirstRoll by viewModel.isFirstRoll.collectAsState()
 
@@ -80,25 +80,25 @@ fun GameScreen(
             //message row
             Row(
                 modifier = modifier
-                    .padding(bottom = 10.dp)
+                    .padding(bottom = 15.dp)
             ) {
-                if (isPointSet == true) {
+                if (currentPoint != 0) {
                     Text(
                         style = MaterialTheme.typography.displayMedium,
-                        text = stringResource(R.string.point_set) + "$currentPoint"
+                        text = stringResource(R.string.point_set) + " " + "$currentPoint"
                     )
                 }
 
                 if (amountWon > 0) {
                     Text(
                         style = MaterialTheme.typography.displayMedium,
-                        text = stringResource(R.string.amount_won) + String.format("%.2f", amountWon).toDouble()
+                        text = stringResource(R.string.amount_won) + " " + String.format("%.2f", amountWon)
                     )
                 }
                 if (amountWon < 0) {
                     Text(
                         style = MaterialTheme.typography.displayMedium,
-                        text = stringResource(R.string.amount_lost) + String.format("%.2f", amountWon).toDouble()
+                        text = stringResource(R.string.amount_lost) + " " + String.format("%.2f", amountWon)
                     )
                 }
             }
@@ -147,7 +147,7 @@ fun GameScreen(
                         imageDie2 = newImageDie2
 
                         //run a round of the game
-                        var (winAmount, currentPoint) = runCrapsGame(
+                        var winAmount = runCrapsGame(
                             totalRoll,
                             isFirstRoll,
                             currentBet,
@@ -158,15 +158,13 @@ fun GameScreen(
                         viewModel.updateAmountWon(winAmount)
 
                         //check for point
-                        if (isPointSet == false) {
-                            currentPoint = (determinePointSet(totalRoll))
                             if (currentPoint != 0) {
                                 viewModel.updateIsPointSet(true)
-                            }
                         }
 
                         //update bankroll
-                        bankrollBalance += amountWon
+                        newBankroll = bankrollBalance + amountWon
+                        viewModel.updateBankRoll(newBankroll)
 
 //                        //if game is won reset the roll
 //                        if (isPointSet == true && totalRoll == currentPoint) {
@@ -180,14 +178,14 @@ fun GameScreen(
             }
             //Spacer(modifier = Modifier.height(10.dp))
             //row to hold the button
-            Row(
+           Row(
                 modifier = modifier
                     .padding(0.dp)
                     .fillMaxWidth(),
                 horizontalArrangement = Arrangement.Center,
                 ) {
                 Text(
-                    text = stringResource(R.string.amount_won) + "$amountWon"
+                    text = stringResource(R.string.amount_won) + " " + String.format("%.2f", amountWon)
                 )
             }
             Row(
@@ -198,11 +196,11 @@ fun GameScreen(
                 //verticalAlignment = Alignment.CenterVertically
             ) {
                 Text(
-                    text = stringResource(R.string.amount_bet)
+                    text = stringResource(R.string.amount_bet) + " " + String.format("%.2f", currentBet)
                 )
-                Text(
-                    text = currentBet.toString()
-                )
+                //Text(
+               //     text = currentBet.toString()
+                //)
             }
             Row(
                 modifier = modifier
@@ -211,10 +209,7 @@ fun GameScreen(
                 horizontalArrangement = Arrangement.Center,
             ) {
                 Text(
-                    text = stringResource(R.string.bankroll)
-                )
-                Text(
-                    text = bankrollBalance.toString()
+                    text = stringResource(R.string.bankroll) + " " + String.format("%.2f", bankrollBalance)
                 )
             }
             Row(
@@ -264,7 +259,7 @@ fun GameScreen(
                 //Preferences Button
                 Button(
                     //if a gamePoint has been set, disable the option to place a bet
-                    enabled = currentPoint <= 0,
+                    //enabled = currentPoint <= 0,
                     onClick = {
                         onPreferencesButtonClicked()
                     },
@@ -294,7 +289,7 @@ fun runCrapsGame(
     currentBet: Double,
     gamePoint: Int,
     viewModel: CrapsGameViewModel
-): Pair<Double, Int> {
+): Double {
     //var currentPoint: Int
     var amountWon: Double = 0.00
     var possiblePoint: Int
@@ -313,7 +308,7 @@ fun runCrapsGame(
         // currentPoint = gamePoint
         amountWon = subsequentRoundPayout(diceTotal, currentBet, gamePoint, viewModel)
     }
-    return Pair(amountWon, gamePoint)
+    return amountWon
 }
 
 fun determinePointSet(totalRoll: Int): Int {

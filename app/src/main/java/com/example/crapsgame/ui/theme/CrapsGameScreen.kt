@@ -115,7 +115,8 @@ fun CrapsGameApp(
                 //call PlaceBet Screen
                 PlaceBetScreen(
                     viewModel = crapsGameViewModel,
-                    onPlaceBetButtonClicked = {navController.navigateUp()}
+                    onPlaceBetButtonClicked = {
+                        navController.navigateUp()}
 
                 )
             }
