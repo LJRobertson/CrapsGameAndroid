@@ -23,6 +23,7 @@ import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.RadioButton
 import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
+import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
@@ -30,15 +31,20 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
+import androidx.lifecycle.viewmodel.compose.viewModel
+import androidx.navigation.NavHostController
 import com.example.crapsgame.R
+import com.example.crapsgame.data.UserPreferencesRepository
 
 
 @Composable
 fun PreferencesScreen(
-    viewModel: CrapsGameViewModel,
+    crapsGameViewModel: CrapsGameViewModel,
+    onSaveButtonClicked: () -> Unit,
     modifier: Modifier = Modifier,
 ) {
-    var diceColorOption = remember { mutableStateOf("Red") }
+    var diceColorOption = remember { mutableStateOf("Black") }
+    //val uiState = crapsGameViewModel.uiState.collectAsState()
     Column(
         modifier = modifier
             .fillMaxSize()
@@ -86,6 +92,8 @@ fun PreferencesScreen(
                 RadioButton(
                     selected = diceColorOption.value == "Red",
                     onClick = { //TODO: click functionality
+                        diceColorOption.value = "Red"
+                        //crapsGameViewModel.updateIsBlack(false)
                     },
                 )
                 Spacer(
@@ -96,6 +104,8 @@ fun PreferencesScreen(
                 RadioButton(
                     selected = diceColorOption.value == "Black",
                     onClick = { //TODO: click functionality
+                        diceColorOption.value="Black"
+                        //crapsGameViewModel.updateIsBlack(false)
                     },
                 )
             }
@@ -108,6 +118,12 @@ fun PreferencesScreen(
                 Button(
                     onClick = {
                         //TODO
+                        if(diceColorOption.value == "Black"){
+                            crapsGameViewModel.updateIsBlack(true)
+                        } else {
+                            crapsGameViewModel.updateIsBlack(false)
+                        }
+                        onSaveButtonClicked()
                     },
                     modifier = Modifier
                         .fillMaxWidth(0.75f)

@@ -44,6 +44,7 @@ fun GameScreen(
     onPlaceBetButtonClicked: () -> Unit,
     onHelpButtonClicked: () -> Unit,
     onPreferencesButtonClicked: () -> Unit,
+    //onSaveButtonClicked: () -> Unit,
     modifier: Modifier = Modifier
 ) {
     val crapsGameUiState by viewModel.uiState.collectAsState()

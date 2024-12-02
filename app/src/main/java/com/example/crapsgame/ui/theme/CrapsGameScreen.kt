@@ -49,6 +49,11 @@ import androidx.navigation.NavHostController
 import androidx.navigation.compose.NavHost
 import com.example.crapsgame.ui.theme.PlaceBetScreen
 import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.automirrored.filled.ArrowBack
+import androidx.compose.material.icons.filled.ArrowBack
+import androidx.compose.material3.Icon
+import androidx.compose.material3.IconButton
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.ui.res.dimensionResource
@@ -57,7 +62,7 @@ import com.example.crapsgame.ui.theme.HelpScreen
 import com.example.crapsgame.ui.theme.PreferencesScreen
 import androidx.lifecycle.viewmodel.viewModelFactory
 import androidx.lifecycle.ViewModelProvider.AndroidViewModelFactory.Companion.APPLICATION_KEY
-
+import androidx.navigation.compose.currentBackStackEntryAsState
 
 
 enum class CrapsGameScreen(@StringRes val title: Int) {
@@ -69,7 +74,12 @@ enum class CrapsGameScreen(@StringRes val title: Int) {
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
-fun CrapsGameTopAppBar(modifier: Modifier = Modifier) {
+fun CrapsGameTopAppBar(
+    currentScreen: CrapsGameScreen,
+    canNavigateBack: Boolean,
+    navigateUp: () -> Unit,
+    modifier: Modifier = Modifier
+) {
     CenterAlignedTopAppBar(
         title = {
             Row(
@@ -81,7 +91,17 @@ fun CrapsGameTopAppBar(modifier: Modifier = Modifier) {
                 )
             }
         },
-        modifier = modifier
+        modifier = modifier,
+        navigationIcon = {
+            if (canNavigateBack) {
+                IconButton(onClick = navigateUp) {
+                    Icon(
+                        imageVector = Icons.AutoMirrored.Filled.ArrowBack,
+                        contentDescription = stringResource(R.string.back)
+                    )
+                }
+            }
+        }
     )
 }
 
@@ -95,11 +115,21 @@ fun CrapsGameApp(
     //onPreferencesButtonClicked: () -> Unit,
     modifier: Modifier = Modifier
 ) {
+    val backStackEntry by navController.currentBackStackEntryAsState()
+    val currentScreen = CrapsGameScreen.valueOf(
+        backStackEntry?.destination?.route ?: CrapsGameScreen.Start.name
+    )
+
     Scaffold(
-        topBar = { CrapsGameTopAppBar() },
+        topBar = { CrapsGameTopAppBar(
+            currentScreen = currentScreen,
+            canNavigateBack = navController.previousBackStackEntry != null,
+            navigateUp = { navController.navigateUp()}
+        ) },
         modifier = Modifier
     ) { it ->
         val uiState by crapsGameViewModel.uiState.collectAsState()
+
 
         //add NavHost
         NavHost(
@@ -121,7 +151,6 @@ fun CrapsGameApp(
                     viewModel = crapsGameViewModel,
                     onPlaceBetButtonClicked = {
                         navController.navigateUp()}
-
                 )
             }
             composable(route = CrapsGameScreen.Help.name) {
@@ -129,11 +158,9 @@ fun CrapsGameApp(
             }
             composable(route = CrapsGameScreen.Preferences.name) {
                 PreferencesScreen(
-                    viewModel = crapsGameViewModel )
-
-                    //viewModel = crapsGameViewModel,
-
-
+                    crapsGameViewModel = crapsGameViewModel,
+                    onSaveButtonClicked = {
+                        navController.popBackStack(CrapsGameScreen.Start.name,inclusive = false)                    })
             }
         }
     }

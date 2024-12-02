@@ -24,5 +24,6 @@
     <string name="how_to_play">How To Play</string>
     <string name="odds">Odds</string>
     <string name="amount_lost">Amount Lost: </string>
+    <string name="back">Go Back</string>
 
 </resources>
