@@ -52,6 +52,15 @@ dependencies {
     implementation(libs.androidx.navigation.compose)
     //add lifecycle viewmodel
     implementation("androidx.lifecycle:lifecycle-viewmodel-compose:2.8.7")
+    //for data preferences
+    implementation("androidx.datastore:datastore-preferences:1.1.1")
+
+
+    //Room  -- trying to use these is breaking the code
+    //implementation("androidx.room:room-runtime:${rootProject.extra["room_version"]}")
+    //KSP is an API for parsing Kotlin Annotations
+    //ksp("androidx.room:room-compiler:${rootProject.extra["room_version"]}")
+    //implementation("androidx.room:room-ktx:${rootProject.extra["room_version"]}")
 
     testImplementation(libs.junit)
     androidTestImplementation(libs.androidx.junit)

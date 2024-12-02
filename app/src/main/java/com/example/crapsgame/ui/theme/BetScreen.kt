@@ -170,12 +170,14 @@ fun PlaceBetScreen(
     val crapsGameState by crapsGameViewModel.uiState.collectAsState()
 }*/
 
+/*
 @Preview
 @Composable
 fun PlaceBetScreenPreview() {
+    //val userPreferencesRepository()
     val viewModel = CrapsGameViewModel()
     PlaceBetScreen(
         viewModel = viewModel,
         onPlaceBetButtonClicked = {}
     )
-}
+}*/

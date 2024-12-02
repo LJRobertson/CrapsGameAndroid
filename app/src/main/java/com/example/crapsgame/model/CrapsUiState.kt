@@ -8,5 +8,5 @@ import androidx.compose.runtime.setValue
 data class CrapsUiState(
     val bankRoll: Double = 100.00,
     val betAmount: Double = 0.00,
-    //val isBlack: Boolean
+    val isDiceBlack: Boolean = true
 )

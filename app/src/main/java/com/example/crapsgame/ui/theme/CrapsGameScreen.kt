@@ -55,6 +55,9 @@ import androidx.compose.ui.res.dimensionResource
 import androidx.lifecycle.viewmodel.compose.viewModel
 import com.example.crapsgame.ui.theme.HelpScreen
 import com.example.crapsgame.ui.theme.PreferencesScreen
+import androidx.lifecycle.viewmodel.viewModelFactory
+import androidx.lifecycle.ViewModelProvider.AndroidViewModelFactory.Companion.APPLICATION_KEY
+
 
 
 enum class CrapsGameScreen(@StringRes val title: Int) {
@@ -85,7 +88,7 @@ fun CrapsGameTopAppBar(modifier: Modifier = Modifier) {
 //layout the game screen
 @Composable
 fun CrapsGameApp(
-    crapsGameViewModel: CrapsGameViewModel = viewModel(),
+    crapsGameViewModel: CrapsGameViewModel = viewModel(factory = CrapsGameViewModel.Factory),
     navController: NavHostController = rememberNavController(),
     //onPlaceBetButtonClicked: () -> Unit,
     //onHelpButtonClicked: () -> Unit,
@@ -97,6 +100,7 @@ fun CrapsGameApp(
         modifier = Modifier
     ) { it ->
         val uiState by crapsGameViewModel.uiState.collectAsState()
+
         //add NavHost
         NavHost(
             navController = navController,
@@ -125,8 +129,11 @@ fun CrapsGameApp(
             }
             composable(route = CrapsGameScreen.Preferences.name) {
                 PreferencesScreen(
-                    viewModel = crapsGameViewModel,
-                    )
+                    viewModel = crapsGameViewModel )
+
+                    //viewModel = crapsGameViewModel,
+
+
             }
         }
     }

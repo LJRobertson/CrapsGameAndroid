@@ -383,6 +383,7 @@ fun subsequentRoundPayout(totalRoll: Int, currentBet: Double, gamePoint: Int,   
 }
 
 
+/*
 @Preview
 @Composable
 fun GameScreenPreview() {
@@ -393,4 +394,4 @@ fun GameScreenPreview() {
         onHelpButtonClicked = {},
         onPreferencesButtonClicked = {}
     )
-}
+}*/

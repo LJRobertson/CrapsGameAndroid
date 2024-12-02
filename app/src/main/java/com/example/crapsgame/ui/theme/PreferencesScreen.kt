@@ -121,6 +121,7 @@ fun PreferencesScreen(
     }
 }
 
+/*
 @Preview
 @Composable
 fun PreferencesScreenPreview() {
@@ -128,4 +129,4 @@ fun PreferencesScreenPreview() {
     PreferencesScreen(
         viewModel = viewModel
     )
-}
+}*/
