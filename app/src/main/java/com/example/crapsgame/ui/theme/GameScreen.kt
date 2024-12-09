@@ -49,6 +49,8 @@ fun GameScreen(
 ) {
     val crapsGameUiState by viewModel.uiState.collectAsState()
     //dice always show 1 and 6 to start
+    //determine dice color
+
     var imageDie1 by rememberSaveable { mutableStateOf(R.drawable.one_black_310338_1280) }
     var imageDie2 by rememberSaveable { mutableStateOf(R.drawable.six_black_310333_1280) }
     var resultDie1 by rememberSaveable { mutableStateOf(1) }
@@ -125,6 +127,45 @@ fun GameScreen(
                     modifier = Modifier
                         .height(100.dp)
                 )
+
+                //TODO add logic for dice image color back to composable. then double check for black defaults anywhere else in code.
+
+                 if (isBlack == true) {
+
+                    imageDie1 = when (resultDie1) {
+                        1 -> R.drawable.one_black_310338_1280
+                        2 -> R.drawable.two_black_310337_1280
+                        3 -> R.drawable.three_black_310336_1280
+                        4 -> R.drawable.four_black_310335_1280
+                        5 -> R.drawable.five_black_310334_1280
+                        else -> R.drawable.six_black_310333_1280
+                    }
+                    imageDie2 = when (resultDie2) {
+                        1 -> R.drawable.one_black_310338_1280
+                        2 -> R.drawable.two_black_310337_1280
+                        3 -> R.drawable.three_black_310336_1280
+                        4 -> R.drawable.four_black_310335_1280
+                        5 -> R.drawable.five_black_310334_1280
+                        else -> R.drawable.six_black_310333_1280
+                    }
+                } else {
+                    imageDie1 = when (resultDie1) {
+                        1 -> R.drawable.one_red_152173_1280
+                        2 -> R.drawable.two_red_152174_1280
+                        3 -> R.drawable.three_red_152175_1280
+                        4 -> R.drawable.four_red_152176_1280
+                        5 -> R.drawable.five_red_152177_1280
+                        else -> R.drawable.six_red_152178_1280
+                    }
+                    imageDie2 = when (resultDie2) {
+                        1 -> R.drawable.one_black_310338_1280
+                        2 -> R.drawable.two_black_310337_1280
+                        3 -> R.drawable.three_black_310336_1280
+                        4 -> R.drawable.four_black_310335_1280
+                        5 -> R.drawable.five_black_310334_1280
+                        else -> R.drawable.six_black_310333_1280
+                    }
+                }
             }
 
             //row to hold the button

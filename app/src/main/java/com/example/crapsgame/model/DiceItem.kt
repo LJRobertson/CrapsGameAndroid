@@ -5,11 +5,16 @@ import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import com.example.crapsgame.R
+import com.example.crapsgame.ui.theme.CrapsGameViewModel
+
+
+//THIS ENTIRE OBJECT IS NOT NEEDED. DICE SELECTION SHOULD BE IN COMPOSABLE
 
 data class DiceItem(
     var resultDie1: Int,
     var resultDie2: Int,
-    var isBlack: Boolean
+    var isBlack: Boolean,
+
 ) {
     //imageResource of each die
 
@@ -18,8 +23,9 @@ data class DiceItem(
     fun getImageResources(): Pair<Int, Int> {
         val imageResourceDie1: Int
         val imageResourceDie2: Int
+        //isBlack =
 
-        if (isBlack) {
+        if (isBlack == true) {
 
             imageResourceDie1 = when (resultDie1) {
                 1 -> R.drawable.one_black_310338_1280
