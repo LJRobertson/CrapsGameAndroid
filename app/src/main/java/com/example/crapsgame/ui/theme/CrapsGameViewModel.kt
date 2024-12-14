@@ -12,8 +12,9 @@ import androidx.lifecycle.viewModelScope
 import androidx.lifecycle.viewmodel.initializer
 import androidx.lifecycle.viewmodel.viewModelFactory
 import com.example.crapsgame.CrapsGameApplication
+import com.example.crapsgame.R
 import com.example.crapsgame.data.UserPreferencesRepository
-import com.example.crapsgame.model.DiceItem
+//import com.example.crapsgame.model.DiceItem
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.SharingStarted
 import kotlinx.coroutines.flow.StateFlow
@@ -29,6 +30,8 @@ class CrapsGameViewModel(private val userPreferencesRepository: UserPreferencesR
 
     private val _bankroll = MutableStateFlow(100.00)
     private val _currentBet = MutableStateFlow(0.00)
+    private val _dieImage1 = MutableStateFlow(R.drawable.one_black_310338_1280)
+    private val _dieImage2 = MutableStateFlow(R.drawable.six_black_310333_1280)
 
 
     //private val _uiState = MutableStateFlow(CrapsUiState(isDiceBlack = false))
@@ -39,7 +42,7 @@ class CrapsGameViewModel(private val userPreferencesRepository: UserPreferencesR
                 isDiceBlack to bankroll
             }
             .combine(_currentBet) { (isDiceBlack, bankroll), currentBet ->
-                CrapsUiState(bankroll, currentBet, isDiceBlack)
+                CrapsUiState(bankroll, currentBet, isDiceBlack, currentPoint.value)
             }
             //.map {isDiceBlack ->
             //CrapsUiState()
@@ -97,7 +100,7 @@ class CrapsGameViewModel(private val userPreferencesRepository: UserPreferencesR
     // Ui state for Bankroll
     val bankroll: StateFlow<Double> = _bankroll
 
-    //function to update isFirstRoll
+    //update the bankroll
     fun updateBankRoll(newBalance : Double){
         _bankroll.value = newBalance
     }
@@ -114,10 +117,10 @@ class CrapsGameViewModel(private val userPreferencesRepository: UserPreferencesR
         }
     }
 
-    fun getDiceImages(isBlack:Boolean): Pair<Int, Int> {
+/*    fun getDiceImages(isBlack:Boolean): Pair<Int, Int> {
         val diceItem = DiceItem(resultDie1 = 6, resultDie2 = 1, isBlack)
         return diceItem.getImageResources()
-    }
+    }*/
 
     companion object{
         val Factory: ViewModelProvider.Factory = viewModelFactory {
@@ -128,4 +131,42 @@ class CrapsGameViewModel(private val userPreferencesRepository: UserPreferencesR
         }
     }
 
+    //Ui to hold dice image
+    val dieImage1: StateFlow<Int> = _dieImage1
+    val dieImage2: StateFlow<Int> = _dieImage2
+
+    //function to update image
+    fun updateDiceImages(die1: Int, die2: Int) {
+        //val isBlack = userPreferencesRepository.isDiceBlack.value
+        val isBlack = uiState.value.isDiceBlack
+
+        _dieImage1.value = getDiceImage(die1, isBlack)
+        _dieImage2.value = getDiceImage(die2, isBlack)
+    }
+
+
+    fun getDiceImage(dieResult: Int, isBlack:Boolean): Int {
+
+        return if (isBlack == true) {
+
+            when (dieResult) {
+                1 -> R.drawable.one_black_310338_1280
+                2 -> R.drawable.two_black_310337_1280
+                3 -> R.drawable.three_black_310336_1280
+                4 -> R.drawable.four_black_310335_1280
+                5 -> R.drawable.five_black_310334_1280
+                else -> R.drawable.six_black_310333_1280
+            }
+
+        } else {
+            when (dieResult) {
+                1 -> R.drawable.one_red_152173_1280
+                2 -> R.drawable.two_red_152174_1280
+                3 -> R.drawable.three_red_152175_1280
+                4 -> R.drawable.four_red_152176_1280
+                5 -> R.drawable.five_red_152177_1280
+                else -> R.drawable.six_red_152178_1280
+            }
+        }
+    }
 }
