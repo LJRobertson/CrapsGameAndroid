@@ -458,7 +458,7 @@ fun runCrapsGame2(viewModel: CrapsGameViewModel
     //update bankroll
     newBankroll = bankrollBalance + amountWon
     viewModel.updateBankRoll(newBankroll)
-       // viewModel.updateBankRoll(payoutAmount)
+
 
 }
 
