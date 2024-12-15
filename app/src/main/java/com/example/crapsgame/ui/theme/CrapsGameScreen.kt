@@ -110,6 +110,8 @@ fun CrapsGameApp(
                 PlaceBetScreen(
                     viewModel = crapsGameViewModel,
                     onPlaceBetButtonClicked = {
+                        var newBalance = (crapsGameViewModel.bankroll.value - crapsGameViewModel.currentBet.value)
+                        crapsGameViewModel.updateBankRoll(newBalance)
                         navController.navigateUp()}
                 )
             }
