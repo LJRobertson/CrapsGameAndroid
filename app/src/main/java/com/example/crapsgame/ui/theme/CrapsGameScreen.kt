@@ -160,7 +160,8 @@ fun CrapsGameApp(
                 PreferencesScreen(
                     crapsGameViewModel = crapsGameViewModel,
                     onSaveButtonClicked = {
-                        navController.popBackStack(CrapsGameScreen.Start.name,inclusive = false)                    })
+                        navController.popBackStack(CrapsGameScreen.Start.name,inclusive = false)
+                    })
             }
         }
     }
