@@ -1,6 +1,5 @@
 package com.example.crapsgame.ui.theme
 
-import android.util.Log
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
@@ -26,24 +25,13 @@ import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.ui.res.painterResource
 import androidx.compose.runtime.getValue
-import androidx.compose.runtime.mutableDoubleStateOf
 import androidx.compose.runtime.setValue
-import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
-import androidx.navigation.NavHostController
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.lifecycle.viewmodel.compose.viewModel
-//import com.example.crapsgame.model.DiceItem
-import java.text.NumberFormat
 import kotlin.math.round
-import androidx.lifecycle.lifecycleScope
-import kotlinx.coroutines.flow.collect
-import kotlinx.coroutines.launch
-import androidx.compose.runtime.getValue
 import androidx.compose.runtime.remember
-import androidx.compose.runtime.setValue
-
 
 
 //layout the game screen
@@ -56,32 +44,19 @@ fun GameScreen(
     //onSaveButtonClicked: () -> Unit,
     modifier: Modifier = Modifier
 ) {
-    val crapsGameUiState by viewModel.uiState.collectAsState()
+    //val crapsGameUiState by viewModel.uiState.collectAsState()
     var imageDie1 by rememberSaveable { mutableStateOf(R.drawable.one_black_310338_1280) }
     var imageDie2 by rememberSaveable { mutableStateOf(R.drawable.six_black_310333_1280) }
-    var resultDie1 by rememberSaveable { mutableStateOf(1) }
-    var resultDie2 by rememberSaveable { mutableStateOf(6) }
     val dieImage1 by viewModel.dieImage1.collectAsState()
     val dieImage2 by viewModel.dieImage2.collectAsState()
-    //imageResource of each die
-    //Moved to DiceItem
-
     val bankrollBalance by viewModel.bankroll.collectAsState()
-    val isPointSet by viewModel.isPointSet.collectAsState()
-    //val isBlack by rememberSaveable {mutableStateOf(true)}
     val isBlack by viewModel.isBlack.collectAsState()
-    var newBankroll: Double
-    var totalRoll: Int
-    var roll1Result: Int
-    var roll2Result: Int
-    val isFirstRoll by viewModel.isFirstRoll.collectAsState()
-
     val amountWon by viewModel.amountWon.collectAsState()
     val currentBet by viewModel.currentBet.collectAsState()
     val currentPoint by viewModel.currentPoint.collectAsState()
     var isCrapsGameRunning by remember {mutableStateOf(false)}
 
-    //Launched effect to pick up whether the dice have been changed between black and red
+    //LaunchedEffect to pick up whether the dice have been changed between black and red images
     LaunchedEffect (isBlack){
         viewModel.updateDiceImages(dieImage1,dieImage2)
     }
@@ -135,32 +110,17 @@ fun GameScreen(
                     modifier = Modifier
                         .height(100.dp)
                 )
-                /*Image(
-                    painter = painterResource(imageDie1),
-                    //painter = painterResource(imageDie1),
-                    contentDescription = imageDie1.toString(),
-                    modifier = Modifier
-                        .height(100.dp)
-                )*/
-                //add some space between the dice
                 Spacer(modifier = Modifier.width(30.dp))
-                /*Image(
-                    painter = painterResource(imageDie2),
-                    contentDescription = imageDie2.toString(),
-                    modifier = Modifier
-                        .height(100.dp)
-                )*/
+
                 Image(
                     painter = painterResource(id=dieImage2),
                     contentDescription = imageDie2.toString(),
                     modifier = Modifier
                         .height(100.dp)
                 )
-                //getDiceImage(resultDie2, isBlack)
-
             }
 
-            //row to hold the button
+            //row to hold the Roll button
             Row(
                 modifier = modifier
                     .padding(0.dp)
@@ -181,12 +141,12 @@ fun GameScreen(
                 }
                 //run the game from this point
                 if (isCrapsGameRunning == true){
-                    runCrapsGame2(viewModel)
+                    RunCrapsGame(viewModel)
                     //change isCrapsGameRunning flag to allow game to be run again on next button click
                     isCrapsGameRunning = false
                 }
             }
-            //row to hold the button
+            //row to hold the buttons
            Row(
                 modifier = modifier
                     .padding(0.dp)
@@ -202,14 +162,10 @@ fun GameScreen(
                     .padding(0.dp)
                     .fillMaxWidth(),
                 horizontalArrangement = Arrangement.Center,
-                //verticalAlignment = Alignment.CenterVertically
             ) {
                 Text(
                     text = stringResource(R.string.amount_bet) + " " + String.format("%.2f", currentBet)
                 )
-                //Text(
-               //     text = currentBet.toString()
-                //)
             }
             Row(
                 modifier = modifier
@@ -267,8 +223,6 @@ fun GameScreen(
 
                 //Preferences Button
                 Button(
-                    //if a gamePoint has been set, disable the option to place a bet
-                    //enabled = currentPoint <= 0,
                     onClick = {
                         onPreferencesButtonClicked()
                     },
@@ -283,49 +237,6 @@ fun GameScreen(
 }
 
 
-//get dice image -- returns the Image
-/*@Composable
-fun getDiceImage(dieResult: Int, isBlack:Boolean) {
-
-    val image = if (isBlack == true) {
-
-        when (dieResult) {
-            1 -> R.drawable.one_black_310338_1280
-            2 -> R.drawable.two_black_310337_1280
-            3 -> R.drawable.three_black_310336_1280
-            4 -> R.drawable.four_black_310335_1280
-            5 -> R.drawable.five_black_310334_1280
-            else -> R.drawable.six_black_310333_1280
-        }
-
-    }else {
-       when (dieResult) {
-            1 -> R.drawable.one_red_152173_1280
-            2 -> R.drawable.two_red_152174_1280
-            3 -> R.drawable.three_red_152175_1280
-            4 -> R.drawable.four_red_152176_1280
-            5 -> R.drawable.five_red_152177_1280
-            else -> R.drawable.six_red_152178_1280
-        }
-    }
-
-        Image(
-            painter = painterResource(id = image),
-            contentDescription = dieResult.toString(),
-            modifier = Modifier
-                .height(100.dp)
-        )
-}*/
-
-//Roll Dice -- happens when Roll is clicked
-/*fun rollDice(areDiceBlack: Boolean): Pair<Int, DiceItem> {
-    val resultDie1 = (1..6).random()
-    val resultDie2 = (1..6).random()
-    val diceItem = DiceItem(resultDie1, resultDie2, areDiceBlack)
-    val totalRoll = resultDie1 + resultDie2
-    return Pair(totalRoll, diceItem)
-}*/
-
 //Roll singular die
 fun rollDie(): Int {
     val dieResult = (1..6).random()
@@ -333,94 +244,19 @@ fun rollDie(): Int {
     return dieResult
     }
 
-/*
-fun runCrapsGame(
-    diceTotal: Int,
-    isFirstRole: Boolean,
-    currentBet: Double,
-    gamePoint: Int,
-    viewModel: CrapsGameViewModel
-): Double {
-
-    //roll the dice
-    //val (totalRoll, diceItem) = rollDice(isBlack)
-    val resultDie1 = rollDie()
-    val resultDie2 = rollDie()
-    val totalRoll = resultDie1 + resultDie2
-
-    //get the total and new images back and store as new image
-    val imageDie1 = viewModel.getDiceImage(resultDie1, isBlack)
-    val imageDie2 = viewModel.getDiceImage(resultDie2, isBlack)
-
-    //val (newImageDie1, newImageDie2) = getDiceImage()
-    //store the new images over the old
-    //imageDie1 = newImageDie1
-    //imageDie2 = newImageDie2
-
-    //run a round of the game
-    var winAmount = runCrapsGame(
-        totalRoll,
-        isFirstRoll,
-        currentBet,
-        currentPoint,
-        viewModel
-    )
-    viewModel.updateAmountWon(winAmount)
-
-    //check for point
-    if (currentPoint != 0) {
-        viewModel.updateIsPointSet(true)
-    }
-
-    //update bankroll
-    newBankroll = bankrollBalance + amountWon
-    viewModel.updateBankRoll(newBankroll)
-
-//                        //if game is won reset the roll
-//                        if (isPointSet == true && totalRoll == currentPoint) {
-//                            viewModel.updateFirstRoll(true)
-//                            viewModel.updateIsPointSet(false)
-//                        }
-    //old method starts here
-    //var currentPoint: Int
-    var amountWon: Double = 0.00
-    var possiblePoint: Int
-
-    if (isFirstRole == true) {
-        amountWon = firstRoundPayout(diceTotal, currentBet)
-        possiblePoint = determinePointSet(diceTotal)
-        if (possiblePoint != 0) {
-            viewModel.updatePoint(possiblePoint)
-            viewModel.updateIsPointSet(true)
-            viewModel.updateFirstRoll(false)
-        }
-    }
-    if (gamePoint != 0) {
-        //currentPoint may not be needed here since I can use gamePoint directly
-        // currentPoint = gamePoint
-        amountWon = subsequentRoundPayout(diceTotal, currentBet, gamePoint, viewModel)
-    }
-    return amountWon
-}
-*/
-
 @Composable
-fun runCrapsGame2(viewModel: CrapsGameViewModel
+fun RunCrapsGame(viewModel: CrapsGameViewModel
     ) {
-        //val crapsGameViewModel = viewModel
-        val isBlack by viewModel.isBlack.collectAsState()
-        var newBankroll: Double
+        //Runs a round of the game
+
+    var newBankroll: Double
     val amountWon by viewModel.amountWon.collectAsState()
     val currentBet by viewModel.currentBet.collectAsState()
     val currentPoint by viewModel.currentPoint.collectAsState()
     val firstRoll by viewModel.isFirstRoll.collectAsState()
     var possiblePoint: Int
-    // val currentPoint = viewModel.currentPoint
-    //val currentBet = viewModel.currentBet
     val bankrollBalance by viewModel.bankroll.collectAsState()
-    val isPointSet by viewModel.isPointSet.collectAsState()
-    var payoutAmount: Double = 0.00
-
+    var payoutAmount = 0.00
 
     //roll the dice
         val resultDie1 = rollDie()
@@ -434,38 +270,41 @@ fun runCrapsGame2(viewModel: CrapsGameViewModel
         if (currentPoint != 0) {
             viewModel.updateIsPointSet(true)
         }
-
+        //first roll has different logic
         if (firstRoll == true) {
+            //calculate first round payout
             payoutAmount = firstRoundPayout(totalRoll, currentBet)
+            //set game point if applicable
             possiblePoint = determinePointSet(totalRoll)
             if (possiblePoint != 0) {
                 viewModel.updatePoint(possiblePoint)
                 viewModel.updateIsPointSet(true)
                 viewModel.updateFirstRoll(false)
             }
-
         }
+
+        //if there is already a point set
         if (currentPoint != 0) {
-            //currentPoint may not be needed here since I can use gamePoint directly
-            // currentPoint = gamePoint
+            //payouts for when a game point is set
             payoutAmount = subsequentRoundPayout(totalRoll, currentBet, currentPoint, viewModel)
             //update bankroll
             newBankroll = bankrollBalance + amountWon
             viewModel.updateBankRoll(newBankroll)
         }
+
     //update win amount
     viewModel.updateAmountWon(payoutAmount)
     //update bankroll
     newBankroll = bankrollBalance + amountWon
     viewModel.updateBankRoll(newBankroll)
-
-
 }
 
 fun determinePointSet(totalRoll: Int): Int {
+    //determines if a game point can be set
     val nonPointNumbers = setOf(2, 3, 7, 11, 12)
     val pointNumber: Int
 
+    //if the total roll is not in the nonPointNumbers, set it to the game point
     if (totalRoll in nonPointNumbers) {
         return 0
     } else {
@@ -475,16 +314,20 @@ fun determinePointSet(totalRoll: Int): Int {
 }
 
 fun firstRoundPayout(totalRoll: Int, currentBet: Double): Double {
+    //payout logic for first round of gameplay
     val winningNumbers = setOf(7, 11)
     val losingNumbers = setOf(2, 3, 12)
     val payout: Double
 
+    //if the total roll is a losing number, current bet amount is lost
     if (totalRoll in losingNumbers) {
         payout = 0.00 - currentBet //loses bet
         return payout
+    // if total roll is in winning numbers, the payout is twice the bet amount
     } else if (totalRoll in winningNumbers) {
-        payout = currentBet * 2 // pays double
+        payout = currentBet * 1 // pays even money
         return payout
+    //numbers not in winning or losing numbers do not earn a payout.
     } else {
         payout = 0.00
         return payout
@@ -493,14 +336,17 @@ fun firstRoundPayout(totalRoll: Int, currentBet: Double): Double {
 
 fun subsequentRoundPayout(totalRoll: Int, currentBet: Double, gamePoint: Int,     viewModel: CrapsGameViewModel
 ): Double {
+    //payout logic for when a game point has been set
     var payout = 0.00
     var units: Double
 
+    //a roll of 7 always loses
     if (totalRoll == 7) {
         payout = 0 - currentBet // loses bet
         viewModel.updateFirstRoll(true)
         viewModel.updatePoint(0)
         viewModel.updateIsPointSet(false)
+    // a roll that matches the game point wins
     } else if (totalRoll == gamePoint) {
         if (gamePoint == 4 || gamePoint == 10) {
             //payout is 9:5
@@ -526,6 +372,7 @@ fun subsequentRoundPayout(totalRoll: Int, currentBet: Double, gamePoint: Int,   
         viewModel.updatePoint(0)
         viewModel.updateIsPointSet(false)
         return payout
+    // everything else continues without a payout
     } else {
         //nothing won or lost
         payout = 0.00

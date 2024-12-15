@@ -1,10 +1,8 @@
 package com.example.crapsgame.ui.theme
 
 import androidx.compose.foundation.background
-import androidx.compose.foundation.gestures.snapping.SnapPosition
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.runtime.Composable
-import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.Modifier
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
@@ -21,9 +19,7 @@ import androidx.compose.material3.Button
 import androidx.compose.material3.Card
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.RadioButton
-import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
-import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
@@ -31,12 +27,9 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
-import androidx.lifecycle.viewmodel.compose.viewModel
-import androidx.navigation.NavHostController
 import com.example.crapsgame.R
-import com.example.crapsgame.data.UserPreferencesRepository
 
-
+//screen that allows user to select red or black dice images
 @Composable
 fun PreferencesScreen(
     crapsGameViewModel: CrapsGameViewModel,
@@ -44,7 +37,6 @@ fun PreferencesScreen(
     modifier: Modifier = Modifier,
 ) {
     var diceColorOption = remember { mutableStateOf("Black") }
-    //val uiState = crapsGameViewModel.uiState.collectAsState()
     Column(
         modifier = modifier
             .fillMaxSize()
@@ -81,7 +73,7 @@ fun PreferencesScreen(
                     text = stringResource(R.string.dice_color)
                 )
             }
-
+            //Row to hold the buttons
             Row(
                 horizontalArrangement = Arrangement.Center,
                 verticalAlignment = Alignment.CenterVertically,
@@ -91,9 +83,8 @@ fun PreferencesScreen(
                 Text(text = stringResource(R.string.red));
                 RadioButton(
                     selected = diceColorOption.value == "Red",
-                    onClick = { //TODO: click functionality
+                    onClick = {
                         diceColorOption.value = "Red"
-                        //crapsGameViewModel.updateIsBlack(false)
                     },
                 )
                 Spacer(
@@ -103,7 +94,7 @@ fun PreferencesScreen(
                 Text(text = stringResource(R.string.black));
                 RadioButton(
                     selected = diceColorOption.value == "Black",
-                    onClick = { //TODO: click functionality
+                    onClick = {
                         diceColorOption.value="Black"
                         //crapsGameViewModel.updateIsBlack(false)
                     },
@@ -117,7 +108,7 @@ fun PreferencesScreen(
             ){
                 Button(
                     onClick = {
-                        //TODO
+                        //if black was selected, change isBlack to True, False if red was selected
                         if(diceColorOption.value == "Black"){
                             crapsGameViewModel.updateIsBlack(true)
                         } else {

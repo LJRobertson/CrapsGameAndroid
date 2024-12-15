@@ -1,67 +1,30 @@
 package com.example.crapsgame.ui.theme
 
 import androidx.annotation.StringRes
-import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
-import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import com.example.crapsgame.R
-import androidx.compose.foundation.Image
-import androidx.compose.foundation.layout.Spacer
-import androidx.compose.foundation.layout.fillMaxSize
-import androidx.compose.foundation.layout.fillMaxWidth
-import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
-import androidx.compose.foundation.layout.width
-import androidx.compose.foundation.rememberScrollState
-import androidx.compose.foundation.verticalScroll
-import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
-import androidx.compose.material3.Button
 import androidx.compose.material3.CenterAlignedTopAppBar
 import androidx.compose.material3.Scaffold
 import androidx.compose.ui.res.stringResource
 import androidx.compose.material3.Text
-import androidx.compose.material3.rememberBottomAppBarState
-import androidx.compose.runtime.mutableStateOf
-import androidx.compose.ui.res.painterResource
 import androidx.compose.runtime.getValue
-import androidx.compose.runtime.mutableDoubleStateOf
-import androidx.compose.runtime.setValue
 import androidx.compose.ui.tooling.preview.Preview
-import androidx.compose.ui.unit.dp
-import java.security.KeyStore.TrustedCertificateEntry
-import androidx.compose.runtime.remember
-import androidx.compose.runtime.getValue
-import androidx.compose.runtime.setValue
 import androidx.navigation.compose.NavHost
-import androidx.compose.foundation.layout.padding
 import androidx.navigation.compose.composable
-import androidx.compose.foundation.layout.fillMaxSize
-import androidx.compose.ui.platform.LocalContext
-import androidx.compose.ui.res.dimensionResource
-import androidx.compose.foundation.layout.fillMaxHeight
 import androidx.compose.material3.MaterialTheme
 import androidx.navigation.compose.rememberNavController
 import androidx.navigation.NavHostController
-import androidx.navigation.compose.NavHost
-import com.example.crapsgame.ui.theme.PlaceBetScreen
-import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.ArrowBack
-import androidx.compose.material.icons.filled.ArrowBack
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.runtime.collectAsState
-import androidx.compose.runtime.saveable.rememberSaveable
-import androidx.compose.ui.res.dimensionResource
 import androidx.lifecycle.viewmodel.compose.viewModel
-import com.example.crapsgame.ui.theme.HelpScreen
-import com.example.crapsgame.ui.theme.PreferencesScreen
-import androidx.lifecycle.viewmodel.viewModelFactory
-import androidx.lifecycle.ViewModelProvider.AndroidViewModelFactory.Companion.APPLICATION_KEY
 import androidx.navigation.compose.currentBackStackEntryAsState
 
 
@@ -71,7 +34,7 @@ enum class CrapsGameScreen(@StringRes val title: Int) {
     Help(title = R.string.help_screen),
     Preferences(title = R.string.preferences)
 }
-
+//composables for main application
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun CrapsGameTopAppBar(
@@ -110,9 +73,6 @@ fun CrapsGameTopAppBar(
 fun CrapsGameApp(
     crapsGameViewModel: CrapsGameViewModel = viewModel(factory = CrapsGameViewModel.Factory),
     navController: NavHostController = rememberNavController(),
-    //onPlaceBetButtonClicked: () -> Unit,
-    //onHelpButtonClicked: () -> Unit,
-    //onPreferencesButtonClicked: () -> Unit,
     modifier: Modifier = Modifier
 ) {
     val backStackEntry by navController.currentBackStackEntryAsState()
@@ -161,13 +121,12 @@ fun CrapsGameApp(
                     crapsGameViewModel = crapsGameViewModel,
                     onSaveButtonClicked = {
                         navController.popBackStack(CrapsGameScreen.Start.name,inclusive = false)
-                    })
+                    }
+                )
             }
         }
     }
 }
-
-
 
 
 @Preview

@@ -1,16 +1,13 @@
 package com.example.crapsgame.ui.theme
 
-import android.graphics.Paint.Align
 import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.background
 import androidx.compose.foundation.border
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.runtime.Composable
-import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.Modifier
 import androidx.compose.foundation.layout.Column
-import androidx.compose.foundation.layout.fillMaxHeight
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
@@ -21,34 +18,24 @@ import androidx.compose.foundation.verticalScroll
 import androidx.compose.material3.Button
 import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.Card
-import androidx.compose.material3.FilledTonalButton
 import androidx.compose.material3.MaterialTheme
-import androidx.compose.material3.OutlinedTextField
-import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
-import androidx.compose.runtime.mutableDoubleStateOf
-import androidx.compose.runtime.saveable.rememberSaveable
-import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
-import androidx.lifecycle.viewmodel.compose.viewModel
 import com.example.crapsgame.R
-import org.intellij.lang.annotations.JdkConstants.HorizontalAlignment
-import kotlin.math.round
 
-
+//Screen to select the amount to bet
 @Composable
 fun PlaceBetScreen(
     viewModel: CrapsGameViewModel,
     onPlaceBetButtonClicked: () -> Unit,
     modifier: Modifier = Modifier,
 ) {
-    val crapsGameState by viewModel.uiState.collectAsState()
     val currentBet by viewModel.currentBet.collectAsState()
 
     Column(
@@ -144,8 +131,8 @@ fun PlaceBetScreen(
                     Text(
                         modifier = Modifier,
 
-                        style = MaterialTheme.typography.displaySmall,
-                        text = stringResource(R.string.amount_bet) + currentBet
+                        style = MaterialTheme.typography.displayMedium,
+                        text = stringResource(R.string.amount_bet) + " " + String.format("%.2f", currentBet)
                     )
                     Button(
                         border = BorderStroke(2.dp, Color.DarkGray),
