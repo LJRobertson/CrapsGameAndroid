@@ -38,5 +38,4 @@ class UserPreferencesRepository (
             preferences[IS_DICE_BLACK] = isDiceBlack
         }
     }
-
 }
