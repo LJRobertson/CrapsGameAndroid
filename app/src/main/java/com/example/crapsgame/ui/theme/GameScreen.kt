@@ -55,7 +55,7 @@ fun GameScreen(
     val currentBet by viewModel.currentBet.collectAsState()
     val currentPoint by viewModel.currentPoint.collectAsState()
     var isCrapsGameRunning by remember {mutableStateOf(false)}
-+
+
     //LaunchedEffect to pick up whether the dice have been changed between black and red images
     LaunchedEffect (isBlack){
         viewModel.updateDiceImages(dieImage1,dieImage2)
